@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/spring_batch?useSSL=false&useUnicode=true&characterEncoding=utf-8&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+  batch:
+    initialize-schema: always
+logging:
+  file: D:/workspace-commons/spring-batch-demo/mylog.log
+hbase:
+  config:
+    hbase.zookeeper.quorum: myhbase
+    hbase.zookeeper.port: 2181
+    hbase.zookeeper.znode: /hbase
+    hbase.client.keyvalue.maxsize: 1572864000
