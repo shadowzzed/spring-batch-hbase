@@ -1,5 +1,6 @@
 package com.zed.springbatchdemo.job2.writer;
 
+import com.zed.springbatchdemo.InsertProperties;
 import com.zed.springbatchdemo.hbase.HBaseClient;
 import com.zed.springbatchdemo.job2.model.LogData;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +22,11 @@ import java.util.List;
 @Slf4j
 public class Job2Writer2 implements ItemWriter<LogData[]> {
 
-    private final String TABLE_NAME = "log_data";
-    private final String COLUMN_FAMILY = "attribute";
-    private final String REQUEST_ID = "request_id";
-    private final String REQUEST_PARAMS = "request_params";
-    private final String RESPONSE_PARAMS = "response_params";
+//    private final String TABLE_NAME = "log_data3";
+//    private final String COLUMN_FAMILY = "attribute";
+//    private final String REQUEST_ID = "request_id";
+//    private final String REQUEST_PARAMS = "request_params";
+//    private final String RESPONSE_PARAMS = "response_params";
 
     private HBaseClient hBaseClient;
 
@@ -60,11 +61,12 @@ public class Job2Writer2 implements ItemWriter<LogData[]> {
 //        });
         LogData[] logData = items.get(0);
         for (LogData data:logData) {
-            count++;
-            if (data.getRequestParams()!=null)
-                hBaseClient.insertOrUpdate(TABLE_NAME,count.toString(),COLUMN_FAMILY,new String[]{REQUEST_ID,REQUEST_PARAMS},new String[]{data.getRequestId(),data.getRequestParams()});
-            else
-                hBaseClient.insertOrUpdate(TABLE_NAME,count.toString(),COLUMN_FAMILY,new String[]{REQUEST_ID,RESPONSE_PARAMS},new String[]{data.getRequestId(),data.getResponseParams()});
+            hBaseClient.insertOrUpdate(
+                    InsertProperties.TABLE_NAME,
+                    data.getId()+"$"+data.getDate()+"$"+data.getRequestId(),
+                    InsertProperties.COLUMN_FAMILY,
+                    new String[]{InsertProperties.REQUEST_ID, InsertProperties.REQUEST_PARAMS, InsertProperties.RESPONSE_PARAMS},
+                    new String[]{data.getRequestId(),data.getRequestParams(),data.getResponseParams()});
         }
 
 

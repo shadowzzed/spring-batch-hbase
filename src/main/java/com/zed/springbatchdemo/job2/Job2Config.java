@@ -29,10 +29,13 @@ public class Job2Config {
     private StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public Job processJob2(@Qualifier("orderStep2") Step orderStep) {
+    public Job processJob2(
+            @Qualifier("orderStep2") Step orderStep,
+            Job2Listener listener
+    ) {
         return jobBuilderFactory.get("dataAnalyze")
                 .incrementer(new RunIdIncrementer())
-                .listener(new Job2Listener())
+                .listener(listener)
                 .flow(orderStep)
                 .end()
                 .build();

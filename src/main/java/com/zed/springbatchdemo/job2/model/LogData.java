@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.core.annotation.Order;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 
 /**
  * @author Zeluo
@@ -11,8 +12,9 @@ import javax.persistence.*;
  */
 @Data
 public class LogData {
-    private Integer id;
+    private BigInteger id;
     private String requestId;
     private String requestParams;
     private String responseParams;
+    private String date;
 }

@@ -97,17 +97,21 @@ public class HBaseClient {
 	public void insertOrUpdate(String tableName, String rowKey, String columnFamily, String[] columns, String[] values)
 			throws IOException {
 		Table table = connection.getTable(TableName.valueOf(tableName));
-
+		Put put = new Put(Bytes.toBytes(rowKey));
 		for (int i = 0; i < columns.length; i++) {
-			Put put = new Put(Bytes.toBytes(rowKey));
 			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(columns[i]), Bytes.toBytes(values[i]));
 //			log.info(put.toString());
-			list.add(put);
 		}
+		list.add(put);
 		if (list.size() == 5000) {
 			table.put(list);
 			list = new ArrayList<>();//清空
 		}
+	}
+
+	public void insertRest(String tableName) throws IOException {
+		Table table = connection.getTable(TableName.valueOf(tableName));
+		table.put(list);
 	}
 
 	/**
