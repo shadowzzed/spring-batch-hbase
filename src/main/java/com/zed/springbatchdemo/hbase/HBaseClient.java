@@ -1,7 +1,11 @@
 package com.zed.springbatchdemo.hbase;
 
+import com.zed.springbatchdemo.InsertProperties;
+import com.zed.springbatchdemo.job2.model.LogData;
+import com.zed.springbatchdemo.job2.processor.Job2Processor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.math3.analysis.function.Tan;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
@@ -26,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class HBaseClient {
 
-	private static List<Put> list = new ArrayList<>();
+	public static List<Put> list = new ArrayList<>();
 
 	@Autowired
 	private HbaseConfig config;
@@ -99,19 +103,48 @@ public class HBaseClient {
 		Table table = connection.getTable(TableName.valueOf(tableName));
 		Put put = new Put(Bytes.toBytes(rowKey));
 		for (int i = 0; i < columns.length; i++) {
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(columns[i]), Bytes.toBytes(values[i]));
+ 			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(columns[i]), Bytes.toBytes(values[i]));
 //			log.info(put.toString());
 		}
 		list.add(put);
-		if (list.size() == 5000) {
+		if (list.size() >= 20000) {
+			log.info("开始发送数据***************************************");
 			table.put(list);
 			list = new ArrayList<>();//清空
+			log.info("发送完毕");
 		}
 	}
 
 	public void insertRest(String tableName) throws IOException {
 		Table table = connection.getTable(TableName.valueOf(tableName));
 		table.put(list);
+		list = new ArrayList<>();
+	}
+
+	public void insertAdjust(List<LogData> list,String tableName) throws IOException {
+		if (list.size() > 0) {
+			for (LogData logData: list) {
+				if (logData.getRequestParams()!=null && logData.getResponseParams()==null)
+					this.insertOrUpdate(tableName,
+						logData.getId()+"$"+logData.getDate()+"$"+logData.getRequestId(),
+						InsertProperties.COLUMN_FAMILY,
+						new String[]{InsertProperties.REQUEST_ID,InsertProperties.REQUEST_PARAMS},
+						new String[]{logData.getRequestId(),logData.getRequestParams()});
+				if (logData.getResponseParams()!=null && logData.getRequestParams()==null)
+					this.insertOrUpdate(tableName,
+							logData.getId()+"$"+logData.getDate()+"$"+logData.getRequestId(),
+							InsertProperties.COLUMN_FAMILY,
+							new String[]{InsertProperties.REQUEST_ID,InsertProperties.RESPONSE_PARAMS},
+							new String[]{logData.getRequestId(),logData.getResponseParams()});
+				if (logData.getRequestParams()!=null && logData.getResponseParams()!=null)
+					this.insertOrUpdate(tableName,
+							logData.getId()+"$"+logData.getDate()+"$"+logData.getRequestId(),
+							InsertProperties.COLUMN_FAMILY,
+							new String[]{InsertProperties.REQUEST_ID,InsertProperties.REQUEST_PARAMS,InsertProperties.RESPONSE_PARAMS},
+							new String[]{logData.getRequestId(),logData.getRequestParams(),logData.getResponseParams()});
+			}
+		}
+
 	}
 
 	/**

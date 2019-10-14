@@ -9,6 +9,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,11 +42,12 @@ public class Job2Config {
                 .build();
     }
     @Bean
-    public Step orderStep2(@Qualifier("job2Writer2") ItemWriter<LogData[]> writer) {
+    public Step orderStep2(ItemWriter<LogData[]> writer,
+                           ItemProcessor<String[],LogData[]> job2Processor) {
         return stepBuilderFactory.get("dataAnalyzeStep1")
                 .<String[], LogData[]>chunk(1)
                 .reader(new DataAnaylzeReader())
-                .processor(new Job2Processor())
+                .processor(job2Processor)
                 .writer(writer)
                 .build();
     }

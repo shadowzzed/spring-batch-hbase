@@ -1,5 +1,6 @@
 package com.zed.springbatchdemo.job2.processor;
 
+import com.zed.springbatchdemo.InsertProperties;
 import com.zed.springbatchdemo.hbase.HBaseClient;
 import com.zed.springbatchdemo.job2.model.LogData;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,13 @@ import java.util.regex.Pattern;
 @Slf4j
 @Component
 public class Job2Processor implements ItemProcessor<String[], LogData[]> {
+
+    private HBaseClient hBaseClient;
+
+    @Autowired
+    public Job2Processor(HBaseClient hBaseClient) {
+        this.hBaseClient = hBaseClient;
+    }
 
     public static List<LogData> list_temp = new ArrayList<>();
     public static List<LogData> list_adjust = new ArrayList<>(15000);
@@ -82,9 +90,10 @@ public class Job2Processor implements ItemProcessor<String[], LogData[]> {
                     }
                 }
                 list_adjust.add(logData);
-                break;
+                continue;
             }
 
+            // 普通日志
             if (matcher_requestId.find())
                 logData.setRequestId(matcher_requestId.group());
             if (matcher_requestArg.find()) {
@@ -102,18 +111,13 @@ public class Job2Processor implements ItemProcessor<String[], LogData[]> {
                     logData.setId(new BigInteger(matcher_cstId.group()));
                 list_temp.add(logData);
             }
-            if (list_temp.size()>5) {
-                for (LogData logData1: list_temp)
-                    log.info(logData1.toString());
-                throw new Exception("test");
-            }
             if (matcher_responseArg.find()) {
                 logData.setResponseParams(matcher_responseArg.group());
                 Iterator<LogData> iterator = list_temp.iterator();
                 boolean flag = false;
                 while (iterator.hasNext()) {
                     LogData next = iterator.next();
-                    if (next.getRequestId().equals(logData.getRequestId())) {
+                     if (next.getRequestId().equals(logData.getRequestId())) {
                         iterator.remove();
                         next.setResponseParams(matcher_responseArg.group());
                         list.add(next);
@@ -121,7 +125,7 @@ public class Job2Processor implements ItemProcessor<String[], LogData[]> {
                         break;
                     }
                 }
-                //如果req和res不是一条接一条出现就会有这种情况
+                //如果没找到res对应的req
                 if (!flag)
                     throw new Exception("没有找到对应的req");
             }

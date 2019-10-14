@@ -30,21 +30,15 @@ public class Job2Listener extends JobExecutionListenerSupport {
     @Override
     public void afterJob(JobExecution jobExecution) {
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
-            log.info("completed,剩余{}",Job2Processor.list_temp.size());
+            log.info("completed,剩余{}",HBaseClient.list.size());
             try {
-                //发送剩余的list中的对象
+//                hBaseClient.insertAdjust(InsertProperties.TABLE_NAME);
+                hBaseClient.insertAdjust(Job2Processor.list_adjust,InsertProperties.TABLE_NAME);
+                hBaseClient.insertAdjust(Job2Processor.list_temp,InsertProperties.TABLE_NAME);
                 hBaseClient.insertRest(InsertProperties.TABLE_NAME);
-                // 发送adjust中的对象
-                if(Job2Processor.list_adjust.size() > 0)
-                    for (LogData logData: Job2Processor.list_adjust) {
-                        hBaseClient.insertOrUpdate(
-                                InsertProperties.TABLE_NAME,
-                                logData.getId()+"$"+logData.getDate()+"$"+logData.getRequestId(),
-                                InsertProperties.COLUMN_FAMILY,
-                                new String[]{InsertProperties.REQUEST_ID,InsertProperties.REQUEST_PARAMS,InsertProperties.RESPONSE_PARAMS},
-                                new String[]{logData.getRequestId(),logData.getRequestParams(),logData.getResponseParams()}
-                                );
-                    }
+                log.info("剩余表情况{}",HBaseClient.list.size());
+//                for (LogData logData: Job2Processor.list_temp)
+//                    log.info("{}",logData);
             } catch (IOException e) {
                 e.printStackTrace();
             }
