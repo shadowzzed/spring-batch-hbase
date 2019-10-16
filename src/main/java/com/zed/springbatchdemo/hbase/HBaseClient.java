@@ -1,19 +1,14 @@
 package com.zed.springbatchdemo.hbase;
 
-import com.zed.springbatchdemo.InsertProperties;
+import com.zed.springbatchdemo.ConstantProperties;
 import com.zed.springbatchdemo.job2.model.LogData;
-import com.zed.springbatchdemo.job2.processor.Job2Processor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.math3.analysis.function.Tan;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.RowFilter;
 import org.apache.hadoop.hbase.filter.SubstringComparator;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
@@ -23,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NavigableMap;
-import java.util.concurrent.TimeUnit;
 
 @DependsOn("hbaseConfig")
 @Component
@@ -127,20 +121,20 @@ public class HBaseClient {
 				if (logData.getRequestParams()!=null && logData.getResponseParams()==null)
 					this.insertOrUpdate(tableName,
 						logData.getId()+"$"+logData.getDate()+"$"+logData.getRequestId(),
-						InsertProperties.COLUMN_FAMILY,
-						new String[]{InsertProperties.REQUEST_ID,InsertProperties.REQUEST_PARAMS},
+						ConstantProperties.COLUMN_FAMILY,
+						new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.REQUEST_PARAMS},
 						new String[]{logData.getRequestId(),logData.getRequestParams()});
 				if (logData.getResponseParams()!=null && logData.getRequestParams()==null)
 					this.insertOrUpdate(tableName,
 							logData.getId()+"$"+logData.getDate()+"$"+logData.getRequestId(),
-							InsertProperties.COLUMN_FAMILY,
-							new String[]{InsertProperties.REQUEST_ID,InsertProperties.RESPONSE_PARAMS},
+							ConstantProperties.COLUMN_FAMILY,
+							new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.RESPONSE_PARAMS},
 							new String[]{logData.getRequestId(),logData.getResponseParams()});
 				if (logData.getRequestParams()!=null && logData.getResponseParams()!=null)
 					this.insertOrUpdate(tableName,
 							logData.getId()+"$"+logData.getDate()+"$"+logData.getRequestId(),
-							InsertProperties.COLUMN_FAMILY,
-							new String[]{InsertProperties.REQUEST_ID,InsertProperties.REQUEST_PARAMS,InsertProperties.RESPONSE_PARAMS},
+							ConstantProperties.COLUMN_FAMILY,
+							new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.REQUEST_PARAMS, ConstantProperties.RESPONSE_PARAMS},
 							new String[]{logData.getRequestId(),logData.getRequestParams(),logData.getResponseParams()});
 			}
 		}

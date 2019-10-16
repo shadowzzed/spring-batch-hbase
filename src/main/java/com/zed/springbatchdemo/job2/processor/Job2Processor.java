@@ -1,6 +1,5 @@
 package com.zed.springbatchdemo.job2.processor;
 
-import com.zed.springbatchdemo.InsertProperties;
 import com.zed.springbatchdemo.hbase.HBaseClient;
 import com.zed.springbatchdemo.job2.model.LogData;
 import lombok.extern.slf4j.Slf4j;

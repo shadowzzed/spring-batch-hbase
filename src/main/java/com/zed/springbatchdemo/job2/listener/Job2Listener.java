@@ -1,8 +1,7 @@
 package com.zed.springbatchdemo.job2.listener;
 
-import com.zed.springbatchdemo.InsertProperties;
+import com.zed.springbatchdemo.ConstantProperties;
 import com.zed.springbatchdemo.hbase.HBaseClient;
-import com.zed.springbatchdemo.job2.model.LogData;
 import com.zed.springbatchdemo.job2.processor.Job2Processor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.BatchStatus;
@@ -32,10 +31,10 @@ public class Job2Listener extends JobExecutionListenerSupport {
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
             log.info("completed,剩余{}",HBaseClient.list.size());
             try {
-//                hBaseClient.insertAdjust(InsertProperties.TABLE_NAME);
-                hBaseClient.insertAdjust(Job2Processor.list_adjust,InsertProperties.TABLE_NAME);
-                hBaseClient.insertAdjust(Job2Processor.list_temp,InsertProperties.TABLE_NAME);
-                hBaseClient.insertRest(InsertProperties.TABLE_NAME);
+//                hBaseClient.insertAdjust(ConstantProperties.TABLE_NAME);
+                hBaseClient.insertAdjust(Job2Processor.list_adjust, ConstantProperties.TABLE_NAME);
+                hBaseClient.insertAdjust(Job2Processor.list_temp, ConstantProperties.TABLE_NAME);
+                hBaseClient.insertRest(ConstantProperties.TABLE_NAME);
                 log.info("剩余表情况{}",HBaseClient.list.size());
 //                for (LogData logData: Job2Processor.list_temp)
 //                    log.info("{}",logData);

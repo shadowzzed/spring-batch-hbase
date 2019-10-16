@@ -1,5 +1,6 @@
 package com.zed.springbatchdemo.job2.reader;
 
+import com.zed.springbatchdemo.ConstantProperties;
 import com.zed.springbatchdemo.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
@@ -20,9 +21,10 @@ public class DataAnaylzeReader implements ItemReader<String[]> {
 
 //    private static final String FILEPATH = "D:\\workspace-commons\\log_api.log";
 
-    private static final String PATH = "D:\\workspace-commons\\logs";
+//    private static final String PATH = "D:\\workspace-commons\\logs";
 
-    private static final ArrayList<String> files = FileUtils.getFiles(PATH);
+    //获取所有文件的路径
+    private static final ArrayList<String> files = FileUtils.getFiles(ConstantProperties.SOURCE_PATH);
 
     private int count = 0;
     @Override
