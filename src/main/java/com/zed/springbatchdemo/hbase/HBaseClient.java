@@ -74,28 +74,26 @@ public class HBaseClient {
 
 	/**
 	 * put <tableName>,<rowKey>,<family:column>,<value>,<timestamp>
-	 * @param tableName
 	 * @param rowKey
 	 * @param columnFamily
 	 * @param column
 	 * @param value
 	 * @throws IOException
 	 */
-	public void insertOrUpdate(String tableName, String rowKey, String columnFamily, String column, String value)
+	public void insertOrUpdate(String rowKey, String columnFamily, String column, String value)
 			throws IOException {
-		this.insertOrUpdate(tableName, rowKey, columnFamily, new String[]{column}, new String[]{value});
+		this.insertOrUpdate(rowKey, columnFamily, new String[]{column}, new String[]{value});
 	}
 
 	/**
 	 * put <tableName>,<rowKey>,<family:column>,<value>,<timestamp>
-	 * @param tableName
 	 * @param rowKey
 	 * @param columnFamily
 	 * @param columns
 	 * @param values
 	 * @throws IOException
 	 */
-	public void insertOrUpdate(String tableName, String rowKey, String columnFamily, String[] columns, String[] values)
+	public void insertOrUpdate(String rowKey, String columnFamily, String[] columns, String[] values)
 			throws IOException {
 		Put put = new Put(Bytes.toBytes(rowKey));
 		for (int i = 0; i < columns.length; i++) {
@@ -121,19 +119,19 @@ public class HBaseClient {
 			return;
 		for (LogData logData : list) {
 			if (logData.getRequestParams() != null && logData.getResponseParams() == null)
-				this.insertOrUpdate(ConstantProperties.TABLE_NAME,
+				this.insertOrUpdate(
 						logData.getId() + "$" + logData.getDate() + "$" + logData.getRequestId(),
 						ConstantProperties.COLUMN_FAMILY,
 						new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.REQUEST_PARAMS},
 						new String[]{logData.getRequestId(), logData.getRequestParams()});
 			if (logData.getResponseParams() != null && logData.getRequestParams() == null)
-				this.insertOrUpdate(ConstantProperties.TABLE_NAME,
+				this.insertOrUpdate(
 						logData.getId() + "$" + logData.getDate() + "$" + logData.getRequestId(),
 						ConstantProperties.COLUMN_FAMILY,
 						new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.RESPONSE_PARAMS},
 						new String[]{logData.getRequestId(), logData.getResponseParams()});
 			if (logData.getRequestParams() != null && logData.getResponseParams() != null)
-				this.insertOrUpdate(ConstantProperties.TABLE_NAME,
+				this.insertOrUpdate(
 						logData.getId() + "$" + logData.getDate() + "$" + logData.getRequestId(),
 						ConstantProperties.COLUMN_FAMILY,
 						new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.REQUEST_PARAMS, ConstantProperties.RESPONSE_PARAMS},

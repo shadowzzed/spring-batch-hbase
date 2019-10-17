@@ -48,7 +48,6 @@ public class Job2Writer2 implements ItemWriter<LogData[]> {
         LogData[] logData = items.get(0);
         for (LogData data:logData) {
             hBaseClient.insertOrUpdate(
-                    ConstantProperties.TABLE_NAME,
                     data.getId()+"$"+data.getDate()+"$"+data.getRequestId(),
                     ConstantProperties.COLUMN_FAMILY,
                     new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.REQUEST_PARAMS, ConstantProperties.RESPONSE_PARAMS},
