@@ -26,6 +26,8 @@ public class HBaseClient {
 
 	public static List<Put> list = new ArrayList<>();
 
+	private static Table table;
+
 	@Autowired
 	private HbaseConfig config;
 
@@ -40,6 +42,7 @@ public class HBaseClient {
 		try {
 			connection = ConnectionFactory.createConnection(config.configuration());
 			admin = connection.getAdmin();
+			table = connection.getTable(TableName.valueOf(ConstantProperties.TABLE_NAME));
 		} catch (IOException e) {
 			log.error("HBase create connection failed: {}", e);
 		}
@@ -94,7 +97,6 @@ public class HBaseClient {
 	 */
 	public void insertOrUpdate(String tableName, String rowKey, String columnFamily, String[] columns, String[] values)
 			throws IOException {
-		Table table = connection.getTable(TableName.valueOf(tableName));
 		Put put = new Put(Bytes.toBytes(rowKey));
 		for (int i = 0; i < columns.length; i++) {
  			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(columns[i]), Bytes.toBytes(values[i]));
@@ -110,34 +112,34 @@ public class HBaseClient {
 	}
 
 	public void insertRest(String tableName) throws IOException {
-		Table table = connection.getTable(TableName.valueOf(tableName));
 		table.put(list);
 		list = new ArrayList<>();
 	}
 
-	public void insertAdjust(List<LogData> list,String tableName) throws IOException {
-		if (list.size() > 0) {
-			for (LogData logData: list) {
-				if (logData.getRequestParams()!=null && logData.getResponseParams()==null)
-					this.insertOrUpdate(tableName,
-						logData.getId()+"$"+logData.getDate()+"$"+logData.getRequestId(),
+	public void insertRestOther(List<LogData> list) throws IOException {
+		if (list.size() < 1)
+			return;
+		for (LogData logData : list) {
+			if (logData.getRequestParams() != null && logData.getResponseParams() == null)
+				this.insertOrUpdate(ConstantProperties.TABLE_NAME,
+						logData.getId() + "$" + logData.getDate() + "$" + logData.getRequestId(),
 						ConstantProperties.COLUMN_FAMILY,
 						new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.REQUEST_PARAMS},
-						new String[]{logData.getRequestId(),logData.getRequestParams()});
-				if (logData.getResponseParams()!=null && logData.getRequestParams()==null)
-					this.insertOrUpdate(tableName,
-							logData.getId()+"$"+logData.getDate()+"$"+logData.getRequestId(),
-							ConstantProperties.COLUMN_FAMILY,
-							new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.RESPONSE_PARAMS},
-							new String[]{logData.getRequestId(),logData.getResponseParams()});
-				if (logData.getRequestParams()!=null && logData.getResponseParams()!=null)
-					this.insertOrUpdate(tableName,
-							logData.getId()+"$"+logData.getDate()+"$"+logData.getRequestId(),
-							ConstantProperties.COLUMN_FAMILY,
-							new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.REQUEST_PARAMS, ConstantProperties.RESPONSE_PARAMS},
-							new String[]{logData.getRequestId(),logData.getRequestParams(),logData.getResponseParams()});
-			}
+						new String[]{logData.getRequestId(), logData.getRequestParams()});
+			if (logData.getResponseParams() != null && logData.getRequestParams() == null)
+				this.insertOrUpdate(ConstantProperties.TABLE_NAME,
+						logData.getId() + "$" + logData.getDate() + "$" + logData.getRequestId(),
+						ConstantProperties.COLUMN_FAMILY,
+						new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.RESPONSE_PARAMS},
+						new String[]{logData.getRequestId(), logData.getResponseParams()});
+			if (logData.getRequestParams() != null && logData.getResponseParams() != null)
+				this.insertOrUpdate(ConstantProperties.TABLE_NAME,
+						logData.getId() + "$" + logData.getDate() + "$" + logData.getRequestId(),
+						ConstantProperties.COLUMN_FAMILY,
+						new String[]{ConstantProperties.REQUEST_ID, ConstantProperties.REQUEST_PARAMS, ConstantProperties.RESPONSE_PARAMS},
+						new String[]{logData.getRequestId(), logData.getRequestParams(), logData.getResponseParams()});
 		}
+
 
 	}
 

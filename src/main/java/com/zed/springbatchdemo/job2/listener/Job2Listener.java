@@ -32,8 +32,10 @@ public class Job2Listener extends JobExecutionListenerSupport {
             log.info("completed,剩余{}",HBaseClient.list.size());
             try {
 //                hBaseClient.insertAdjust(ConstantProperties.TABLE_NAME);
-                hBaseClient.insertAdjust(Job2Processor.list_adjust, ConstantProperties.TABLE_NAME);
-                hBaseClient.insertAdjust(Job2Processor.list_temp, ConstantProperties.TABLE_NAME);
+                hBaseClient.insertRestOther(Job2Processor.list_adjust);
+                hBaseClient.insertRestOther(Job2Processor.list_temp);
+                hBaseClient.insertRestOther(Job2Processor.list_finish);
+
                 hBaseClient.insertRest(ConstantProperties.TABLE_NAME);
                 log.info("剩余表情况{}",HBaseClient.list.size());
 //                for (LogData logData: Job2Processor.list_temp)

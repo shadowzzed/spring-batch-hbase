@@ -43,6 +43,8 @@ public class Job2Writer2 implements ItemWriter<LogData[]> {
     @Override
     public void write(List<? extends LogData[]> items) throws Exception {
 
+        if (items.get(0).length < 1)
+            return;
         LogData[] logData = items.get(0);
         for (LogData data:logData) {
             hBaseClient.insertOrUpdate(
