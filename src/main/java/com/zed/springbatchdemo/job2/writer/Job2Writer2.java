@@ -42,10 +42,11 @@ public class Job2Writer2 implements ItemWriter<LogData[]> {
     private Integer count = 0;
     @Override
     public void write(List<? extends LogData[]> items) throws Exception {
-
-        if (items.get(0).length < 1)
+        log.info("到达writer*******************");
+        if (items.size() < 1)
             return;
         LogData[] logData = items.get(0);
+        log.info("发送大小,{}",logData.length);
         for (LogData data:logData) {
             hBaseClient.insertOrUpdate(
                     data.getId()+"$"+data.getDate()+"$"+data.getRequestId(),

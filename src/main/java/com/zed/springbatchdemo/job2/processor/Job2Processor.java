@@ -64,6 +64,7 @@ public class Job2Processor implements ItemProcessor<String, LogData[]> {
     @Override
     public LogData[] process(String str) throws Exception {
 
+
         LogData logData = new LogData();
         Matcher matcher_requestId = pattern_requestId.matcher(str);
         Matcher matcher_responseArg = pattern_responseArg.matcher(str);
@@ -72,6 +73,7 @@ public class Job2Processor implements ItemProcessor<String, LogData[]> {
 
         // 如果日志的内容是adjust，这种日志只有一条请求，没有回应 并且cst_id需要在request_params中解析
         if (str.contains("adjust")) {
+            log.info("分析特殊日志*********************************");
             // 找出date 理论上每条都应该有
             if (matcher_date.find())
                 logData.setDate(matcher_date.group());
@@ -90,16 +92,22 @@ public class Job2Processor implements ItemProcessor<String, LogData[]> {
                     logData.setId(new BigInteger(substring));
                 }
             }
+            log.info("分析特殊日志,{}",logData);
             list_adjust.add(logData);
             if (list_adjust.size() >= 5000) {
-                return list_adjust.toArray(new LogData[list_adjust.size()]);
+                LogData[] logData1 = list_adjust.toArray(new LogData[list_adjust.size()]);
+                list_adjust = new ArrayList<>(5000);
+                return logData1;
             }
         } else {
+
+            log.info("*********************************分析普通日志");
             //普通日志
             //先找出request_id
             if (matcher_requestId.find())
                 logData.setRequestId(matcher_requestId.group());
             //找出request_params date和cstid在这里面进行搜索 因为response仍然需要绑定到request中
+            log.info("提取request ID结束");
             if (matcher_requestArg.find()) {
                 //找出date
                 if (matcher_date.find())
@@ -112,8 +120,10 @@ public class Job2Processor implements ItemProcessor<String, LogData[]> {
                 Matcher matcher_cstId = pattern_cstId.matcher(target);
                 if (matcher_cstId.find())
                     logData.setId(new BigInteger(matcher_cstId.group()));
+                log.info("分析普通日志,{}",logData);
                 list_temp.add(logData);
             }
+            log.info("提取request_params结束");
             //response需要在list_temp表中找到对应的request请求 然后删除list_temp中的对象，新的完整对象存储后发送到writer
             if (matcher_responseArg.find()) {
                 logData.setResponseParams(matcher_responseArg.group());
@@ -132,8 +142,11 @@ public class Job2Processor implements ItemProcessor<String, LogData[]> {
                 }
                 if (!flag)
                     throw new Exception("res没有对应的req");
-                if (list_finish.size() >= 5000)
-                    return list_finish.toArray(new LogData[list_finish.size()]);
+                if (list_finish.size() >= 5000) {
+                    LogData[] logData1 = list_finish.toArray(new LogData[list_finish.size()]);
+                    list_finish = new ArrayList<>(5000);
+                    return logData1;
+                }
             }
         }
         return null;

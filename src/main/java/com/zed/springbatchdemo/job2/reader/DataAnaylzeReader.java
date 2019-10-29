@@ -37,10 +37,15 @@ public class DataAnaylzeReader implements ItemReader<String> {
     private BufferedReader bufferedReader;
     @Override
     public String read() throws Exception {
-        bufferedReader = this.getBuff() == null ? bufferedReader : this.getBuff();
+        log.info("读取文件开始*********************************");
+        BufferedReader buff = this.getBuff();
+        bufferedReader = buff == null ? bufferedReader : buff;
+        log.info("获得bufferedReader*********************");
         String str;
-        if ((str= bufferedReader.readLine()) != null)
+        if ((str= bufferedReader.readLine()) != null) {
+            log.info("读取一行结束***************************");
             return str;
+        }
         else {
             count_should++;
             this.read();
